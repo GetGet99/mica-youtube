@@ -4,12 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MicaWindow;
+using static MicaBrowser.MicaBrowser;
+
 namespace MicaBrowser;
 public interface IMicaBrowserSettings
 {
     Uri URI { get; set; }
     string PreferedTitle { get; set; }
     IMicaWindowSettings MicaWindowSettings { get; }
+    bool AutoFullScreen { get; set; }
+    MicaBrowserWindowStates MicaBrowserWindowState { get; set; }
 }
 partial class MicaBrowser : IMicaBrowserSettings
 {

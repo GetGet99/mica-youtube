@@ -1,12 +1,14 @@
-﻿:root {
+﻿/*:root {
     --accent: #fb9d7f;
-}
+}*/
 
 :root {
     --theme-layering-prop: 0 0% 100%;
     --theme-border-radius: 8px;
 }
-
+ytd-page-manager, ytd-watch-flexy {
+    overflow: revert;
+}
 html {
     overflow: hidden;
 }
@@ -61,6 +63,7 @@ html,
     --yt-spec-themed-blue: var(--accent);
     --yt-spec-static-brand-red: var(--accent);
     --yt-spec-call-to-action: var(--accent);
+    --yt-spec-brand-button-background: var(--accent);
     --yt-spec-general-background-a: transparent;
     --yt-spec-general-background-b: transparent;
     --yt-spec-general-background-c: transparent;
@@ -250,12 +253,31 @@ ytd-browse:not([page-subtype="home"]):not([page-subtype="channels"]) {
     display: none;
 }
 
+.ytp-chrome-controls .ytp-button[aria-pressed]:after,
+.ytp-settings-button.ytp-hd-quality-badge:after,
+.ytp-settings-button.ytp-hdr-quality-badge:after,
+.ytp-settings-button.ytp-4k-quality-badge:after,
+.ytp-settings-button.ytp-5k-quality-badge:after,
+.ytp-settings-button.ytp-8k-quality-badge:after,
+.ytp-settings-button.ytp-3d-badge-grey:after,
+.ytp-settings-button.ytp-3d-badge:after {
+    background-color: var(--accent) !important;
+}
+
 #sections.ytd-guide-renderer>*.ytd-guide-renderer:first-child {
     padding-top: 0px !important;
 }
 :not(ytd-player [class*="-ad-"])[class*="-ad-"] {
     display: none;
 }
+:not(ytd-player [class*="-ads-"])[class*="-ads-"] {
+    display: none;
+}
+
 .ytp-ad-overlay-slot {
     display: none;
+}
+
+yt-icon > svg > g > g:nth-child(1) > path:nth-child(1) {
+    fill: var(--accent) !important;
 }

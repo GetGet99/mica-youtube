@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Windows.UI;
+using Windows.UI.ViewManagement;
 
 namespace Mica_YouTube
 {
@@ -16,19 +18,21 @@ namespace Mica_YouTube
     /// </summary>
     public partial class App : Application
     {
+        static UISettings UISettings = new();
         static string BasePath =>
 #if DEBUG
                             "../../..";
 #else
                             ".";
 #endif
-        static IEnumerable<string> AdblockURIs = File.ReadAllLines("AdblockerText.txt");
+        //static IEnumerable<string> AdblockURIs = File.ReadAllLines("AdblockerText.txt");
         public App()
         {
             var MicaBrowser = new MicaBrowser.MicaBrowser
             {
                 Settings =
                 {
+                    AutoFullScreen = true,
                     URI = new Uri("https://www.youtube.com/"),
                     PreferedTitle = "YouTube",
                     MicaWindowSettings =
@@ -57,14 +61,25 @@ namespace Mica_YouTube
                 CoreWebView2.NavigationCompleted += async delegate
                 {
                     if (!CoreWebView2.Source.Contains("youtube")) return;
+                    
                     bool IsDarkTheme = await CoreWebView2.ExecuteScriptAsync("document.getElementsByTagName('html')[0].getAttribute('dark')")
                     is "\"true\"";
+                    Color c;
+                    if (IsDarkTheme)
+                        c = UISettings.GetColorValue(UIColorType.AccentLight1);
+                    else
+                        c = UISettings.GetColorValue(UIColorType.AccentDark1);
                     MicaBrowser.MicaWindowSettings.ThemeColor =
                         IsDarkTheme ? MicaWindow.BackdropTheme.Dark : MicaWindow.BackdropTheme.Light;
                     await CoreWebView2.ExecuteScriptAsync(@$"
 (function () {{
     let style = document.createElement('style');
-    style.innerHTML = `{File.ReadAllText($"{BasePath}/CSS.css")}`;
+    style.innerHTML = `
+:root {{
+    --accent: rgba({c.R}, {c.G}, {c.B}, {c.A / 255d});
+}}
+
+{File.ReadAllText($"{BasePath}/CSS.css")}`;
     document.head.appendChild(style);
 }})()");
                     await CoreWebView2.ExecuteScriptAsync(
