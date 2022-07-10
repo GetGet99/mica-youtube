@@ -256,6 +256,6 @@ ytd-browse:not([page-subtype="home"]):not([page-subtype="channels"]) {
 :not(ytd-player [class*="-ad-"])[class*="-ad-"] {
     display: none;
 }
-.video-ads.ytp-ad-module {
+.ytp-ad-overlay-slot {
     display: none;
 }

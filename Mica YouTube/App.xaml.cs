@@ -1,4 +1,5 @@
-﻿using System;
+﻿extern alias WV2;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -21,6 +22,7 @@ namespace Mica_YouTube
 #else
                             ".";
 #endif
+        static IEnumerable<string> AdblockURIs = File.ReadAllLines("AdblockerText.txt");
         public App()
         {
             var MicaBrowser = new MicaBrowser.MicaBrowser
@@ -45,11 +47,16 @@ namespace Mica_YouTube
                 .Replace("Mozilla/5.0", "Mozilla/4.0");
                 CoreWebView2.NavigationStarting += (_, e) =>
                 {
-                    var isGoogleLogin = new Uri(e.Uri).Host.Contains("accounts.google.com");
+                    var isGoogleLogin = new Uri(e.Uri).Host.Contains("accounts.google.com") || e.Uri.Contains("microsoftedge.microsoft.com/addons");
                     CoreWebView2.Settings.UserAgent = isGoogleLogin ? GoogleSignInUserAgent : OriginalUserAgent;
+                };
+                CoreWebView2.NavigationStarting += async delegate
+                {
+                    await CoreWebView2.ExecuteScriptAsync("delete window.chrome.webview");
                 };
                 CoreWebView2.NavigationCompleted += async delegate
                 {
+                    if (!CoreWebView2.Source.Contains("youtube")) return;
                     bool IsDarkTheme = await CoreWebView2.ExecuteScriptAsync("document.getElementsByTagName('html')[0].getAttribute('dark')")
                     is "\"true\"";
                     MicaBrowser.MicaWindowSettings.ThemeColor =
@@ -68,6 +75,7 @@ namespace Mica_YouTube
                 };
                 CoreWebView2.FrameCreated += (_, e) =>
                 {
+                    if (!CoreWebView2.Source.Contains("youtube")) return;
                     var frame = e.Frame;
                     frame.NavigationCompleted += delegate
                     {
@@ -82,6 +90,24 @@ namespace Mica_YouTube
                         );
                     };
                 };
+                
+                //foreach (var uri in AdblockURIs)
+                //    if (!uri.StartsWith('!'))
+                //        CoreWebView2.AddWebResourceRequestedFilter(uri,
+                //            WV2::Microsoft.Web.WebView2.Core.CoreWebView2WebResourceContext.All);
+
+                //CoreWebView2.WebResourceRequested += (_, e) =>
+                //{
+                //    var uri = e.Request.Uri;
+                //    if (AdblockURIs.Any(x =>
+                //    {
+                //        if (x.StartsWith('!')) return false;
+                //        return uri.Contains(x);
+                //    }))
+                //    {
+
+                //    }
+                //};
             };
 
             MainWindow = MicaBrowser;
